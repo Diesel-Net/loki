@@ -1,0 +1,4 @@
+loki_host: loki.diesel.net
+
+# encrypted SHA htpasswd (user:password)
+loki_htpasswd: "{{ lookup('env', 'LOKI_HTPASSWD') }}"
