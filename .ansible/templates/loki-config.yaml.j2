@@ -5,6 +5,10 @@ server:
   grpc_server_max_recv_msg_size: 33554432 # 32 MiB
   grpc_server_max_send_msg_size: 33554432 # 32 MiB
 
+grpc_client_config:
+  max_recv_msg_size: 104857600 # default (100 MiB)
+  max_send_msg_size: 33554432 # 32 MiB
+
 common:
   path_prefix: /loki
   storage:
