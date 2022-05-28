@@ -14,9 +14,11 @@ services:
         - traefik.enable=true
         - traefik.http.services.loki.loadbalancer.server.port=3100
         - traefik.http.routers.loki.rule=Host(`{{ loki_host }}`)
+        - traefik.http.routers.loki.tls.certresolver=step-ca
         - traefik.http.middlewares.loki-auth.basicauth.users={{ loki_htpasswd }}
         - traefik.http.routers.loki.middlewares=loki-auth@docker
         - traefik.http.routers.loki.service=loki
+
     networks:
       - {{ traefik_network }}
 
