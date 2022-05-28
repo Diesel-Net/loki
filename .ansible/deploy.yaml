@@ -1,0 +1,39 @@
+- hosts: manager
+  roles:
+    - common
+    - traefik
+  tasks:
+
+    - include_role:
+        name: common
+        tasks_from: make_config_dir
+
+    - include_role:
+        name: common
+        tasks_from: make_data_dir
+
+    # https://github.com/grafana/loki/issues/2018
+    - file:
+        path: '{{ data_dir }}'
+        owner: '10001'
+        group: '10001'
+        mode: u=rwx
+      become: yes
+
+    - name: 'render loki-config.yaml.j2 to loki-config.yaml'
+      template:
+        src: loki-config.yaml.j2
+        dest: '{{ config_dir }}/loki-config.yaml'
+        
+    - include_role:
+        name: docker
+        tasks_from: stack_deploy
+      vars:
+        docker_compose_template: docker-compose.yaml.j2
+
+    - include_role:
+        name: docker
+        tasks_from: service_update
+      vars:
+        options: --force
+        docker_service: loki

@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+
+  loki:
+    image: grafana/loki:2.4.2
+    volumes:
+      - {{ ssl_cert_file }}:/etc/ssl/certs/ca-certificates.crt
+      - {{ localtime_file }}:/etc/localtime
+      - {{ config_dir }}:/etc/loki
+      - {{ data_dir }}:/loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.loki.loadbalancer.server.port=3100
+        - traefik.http.routers.loki.rule=Host(`{{ loki_host }}`)
+        - traefik.http.routers.loki.tls.certresolver=step-ca
+        - traefik.http.middlewares.loki-auth.basicauth.users={{ loki_htpasswd }}
+        - traefik.http.routers.loki.middlewares=loki-auth@docker
+        - traefik.http.routers.loki.service=loki
+
+    networks:
+      - {{ traefik_network }}
+
+networks:
+  {{ traefik_network }}:
+    external: true
+    name: {{ traefik_network }}

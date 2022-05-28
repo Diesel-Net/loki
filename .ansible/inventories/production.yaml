@@ -1,0 +1,16 @@
+all:
+  children:
+
+    manager:
+      hosts:
+        # loki.diesel.net
+        tools.diesel.net:
+        
+  vars:
+    loki_host: loki.diesel.net
+
+    # encrypted SHA htpasswd (user:password)
+    loki_htpasswd: "{{ lookup('env', 'LOKI_HTPASSWD') }}"
+    
+    ansible_user: automation
+    ansible_python_interpreter: /usr/bin/python3
