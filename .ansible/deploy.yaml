@@ -15,8 +15,8 @@
     # https://github.com/grafana/loki/issues/2018
     - file:
         path: '{{ data_dir }}'
-        owner: 10001
-        group: 10001
+        owner: '10001'
+        group: '10001'
         mode: u=rwx
       become: yes
 
