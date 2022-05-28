@@ -15,7 +15,7 @@ steps:
       LOKI_HTPASSWD:
         from_secret: loki_htpasswd
     settings:
-      inventory: .ansible/inventories/${DRONE_BRANCH}
+      inventory: .ansible/inventories/production
       galaxy: .ansible/roles/requirements.yaml
       playbook: .ansible/deploy.yaml
       private_key:
