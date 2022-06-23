@@ -1,9 +1,16 @@
-auth_enabled: false
+# https://grafana.com/docs/loki/latest/configuration/
 
+auth_enabled: false # Org ID will always be "fake"
+
+# https://grafana.com/docs/loki/latest/configuration/#server
 server:
   http_listen_port: 3100
+  # https://github.com/grafana/loki/issues/2271
+  grpc_server_max_recv_msg_size: 33554432 # 32 MiB
+  grpc_server_max_send_msg_size: 33554432 # 32 MiB
 
-common:
+# https://grafana.com/docs/loki/latest/configuration/#common
+common: # common settings to be applied to all distributed loki components
   path_prefix: /loki
   storage:
     filesystem:
@@ -15,25 +22,48 @@ common:
     kvstore:
       store: inmemory
 
+# https://grafana.com/docs/loki/latest/configuration/#schema_config
 schema_config:
   configs:
     - from: 2022-04-20
-      store: boltdb-shipper
+      store: boltdb-shipper # must be this value for use with compactor
       object_store: filesystem
       schema: v11
       index:
         prefix: index_
-        period: 24h
+        period: 24h # must be 24 hours to use with compactor (retention)
+
+# https://grafana.com/docs/loki/latest/configuration/#compactor
+compactor:
+  working_directory: /loki/retention
+  shared_store: filesystem
+  retention_enabled: true # needed to enable log deletion API
+  retention_delete_delay: 2h # delay after which chunks will be fully deleted during retention (not delete requests)
+  delete_request_cancel_period: 24h # data will only be deleted after delete requests have been older than this
 
 # https://grafana.com/docs/loki/latest/configuration/#limits_config
 limits_config:
+  retention_period: 8766h # global retention policy: 1 year
   reject_old_samples: true
   reject_old_samples_max_age: 168h
+  ingestion_rate_mb: 16
+  ingestion_burst_size_mb: 32
+  max_streams_per_user: 0
+  max_global_streams_per_user: 10000
+  max_query_length: 0h
+  max_query_parallelism: 64
+  max_concurrent_tail_requests: 50
+  
 
+# https://grafana.com/docs/loki/latest/configuration/#ingester
 ingester:
   wal:
     enabled: true
     dir: /loki/wal
 
-ruler:
-  alertmanager_url: http://localhost:9093
+# https://grafana.com/docs/loki/latest/configuration/#ingester_client
+ingester_client:
+  grpc_client_config:
+    # https://github.com/grafana/loki/issues/2271
+    max_recv_msg_size: 104857600 # default (100 MiB)
+    max_send_msg_size: 33554432 # 32 MiB
