@@ -1,13 +1,12 @@
 all:
   children:
 
-    manager:
+    swarm_manager:
       hosts:
-        # loki.diesel.net
-        tools.diesel.net:
+        dev.diesel.net:
         
   vars:
-    loki_host: loki.diesel.net
+    loki_host: loki.dev.diesel.net
 
     # encrypted SHA htpasswd (user:password)
     loki_htpasswd: "{{ lookup('env', 'LOKI_HTPASSWD') }}"
