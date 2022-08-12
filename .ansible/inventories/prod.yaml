@@ -6,6 +6,8 @@ all:
         tools.diesel.net:
         
   vars:
+    storage_retention: 90d
+    
     loki_host: loki.diesel.net
 
     # encrypted SHA htpasswd (user:password)
