@@ -2,15 +2,7 @@
 
 auth_enabled: false # Org ID will always be "fake"
 
-# https://grafana.com/docs/loki/latest/configuration/#server
-server:
-  http_listen_port: 3100
-  # https://github.com/grafana/loki/issues/2271
-  grpc_server_max_recv_msg_size: 33554432 # 32 MiB
-  grpc_server_max_send_msg_size: 33554432 # 32 MiB
-
-# https://grafana.com/docs/loki/latest/configuration/#common
-common: # common settings to be applied to all distributed loki components
+common:
   path_prefix: /loki
   storage:
     filesystem:
@@ -22,7 +14,6 @@ common: # common settings to be applied to all distributed loki components
     kvstore:
       store: inmemory
 
-# https://grafana.com/docs/loki/latest/configuration/#schema_config
 schema_config:
   configs:
     - from: 2022-04-20
@@ -33,7 +24,11 @@ schema_config:
         prefix: index_
         period: 24h # must be 24 hours to use with compactor (retention)
 
-# https://grafana.com/docs/loki/latest/configuration/#compactor
+ingester:
+  wal:
+    enabled: true
+    dir: /loki/wal
+
 compactor:
   working_directory: /loki/retention
   shared_store: filesystem
@@ -41,29 +36,42 @@ compactor:
   retention_delete_delay: 2h # delay after which chunks will be fully deleted during retention (not delete requests)
   delete_request_cancel_period: 24h # data will only be deleted after delete requests have been older than this
 
-# https://grafana.com/docs/loki/latest/configuration/#limits_config
 limits_config:
-  retention_period: 8766h # global retention policy: 1 year
+  retention_period: '{{ storage_retention }}' # global retention policy
   reject_old_samples: true
   reject_old_samples_max_age: 168h
   ingestion_rate_mb: 16
   ingestion_burst_size_mb: 32
-  max_streams_per_user: 0
-  max_global_streams_per_user: 10000
-  max_query_length: 0h
-  max_query_parallelism: 64
+  max_global_streams_per_user: 10000 # (default x 2)
+  max_query_length: 0 # unlimited, default=721h
+  max_entries_limit_per_query: 25000
+  max_query_series: 1000 # (default x 2)
+  max_query_parallelism: 64 # (default x 2)
   max_concurrent_tail_requests: 50
-  
+  split_queries_by_interval: 24h
 
-# https://grafana.com/docs/loki/latest/configuration/#ingester
-ingester:
-  wal:
-    enabled: true
-    dir: /loki/wal
+server:
+  http_listen_port: 3100
+  # https://github.com/grafana/loki/issues/2271
+  grpc_server_max_recv_msg_size: 33554432 # 32 MiB
+  grpc_server_max_send_msg_size: 33554432 # 32 MiB
 
-# https://grafana.com/docs/loki/latest/configuration/#ingester_client
 ingester_client:
   grpc_client_config:
-    # https://github.com/grafana/loki/issues/2271
-    max_recv_msg_size: 104857600 # default (100 MiB)
     max_send_msg_size: 33554432 # 32 MiB
+
+querier:
+  max_concurrent: 32
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 4096
+  grpc_client_config:
+    max_send_msg_size: 33554432 # 32 MiB
+
+frontend_worker:
+  grpc_client_config:
+    max_send_msg_size: 33554432 # 32 MiB
+
+frontend:
+  max_outstanding_per_tenant: 4096
+  compress_responses: true
