@@ -1,7 +1,7 @@
 version: '3.8'
 services:
 
-  loki:
+  backend:
     image: grafana/loki:2.9.3
     volumes:
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
@@ -12,7 +12,7 @@ services:
     deploy:
       labels:
         - traefik.enable=true
-        - traefik.http.services.{{ app_name }}.loadbalancer.server.port=3100
+        - traefik.http.services.{{ app_name }}-backend.loadbalancer.server.port=3100
         - traefik.http.middlewares.{{ app_name }}-auth.basicauth.users={{ loki_htpasswd }}
 
         - traefik.http.routers.kiwi-{{ app_name }}.rule=Host(`{{ kiwi_host }}`)
