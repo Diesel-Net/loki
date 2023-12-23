@@ -11,7 +11,7 @@ concurrency:
 
 steps:
   - name: deploy
-    image: docker.nexus.diesel.net/drone-ansible:2.13
+    image: docker.nexus.diesel.net/drone-ansible:7.2.0
     environment:
       LOKI_HTPASSWD:
         from_secret: loki_htpasswd
@@ -43,7 +43,7 @@ concurrency:
 
 steps:
   - name: deploy
-    image: docker.nexus.diesel.net/drone-ansible:2.13
+    image: docker.nexus.diesel.net/drone-ansible:7.2.0
     environment:
       LOKI_HTPASSWD:
         from_secret: loki_htpasswd

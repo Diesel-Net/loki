@@ -8,7 +8,8 @@ all:
   vars:
     storage_retention: 7d
 
-    loki_host: loki.dev.diesel.net
+    kiwi_host: loki.dev.kiwi-labs.net
+    diesel_host: loki.dev.diesel.net
 
     # encrypted SHA htpasswd (user:password)
     loki_htpasswd: "{{ lookup('env', 'LOKI_HTPASSWD') }}"
