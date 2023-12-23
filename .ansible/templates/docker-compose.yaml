@@ -14,13 +14,6 @@ services:
         - traefik.enable=true
         - traefik.http.services.{{ app_name }}.loadbalancer.server.port=3100
         - traefik.http.middlewares.{{ app_name }}-auth.basicauth.users={{ loki_htpasswd }}
-        
-        - traefik.http.routers.loki.rule=Host(`{{ loki_host }}`)
-        - traefik.http.routers.loki.tls.certresolver=step-ca
-        
-        - traefik.http.routers.loki.middlewares=loki-auth@docker
-        - traefik.http.routers.loki.service=loki
-
 
         - traefik.http.routers.kiwi-{{ app_name }}.rule=Host(`{{ kiwi_host }}`)
         - traefik.http.routers.kiwi-{{ app_name }}.middlewares={{ app_name }}-auth@docker
