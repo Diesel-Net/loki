@@ -1,6 +1,6 @@
 # https://grafana.com/docs/loki/latest/configuration/
 
-auth_enabled: false # Org ID will always be "fake"
+auth_enabled: false
 
 common:
   path_prefix: /loki
@@ -23,6 +23,13 @@ schema_config:
       index:
         prefix: index_
         period: 24h # must be 24 hours to use with compactor (retention)
+    - from: "2023-12-22"
+      index:
+        period: 24h
+        prefix: index_
+      object_store: filesystem
+      schema: v12
+      store: tsdb
 
 ingester:
   wal:
@@ -44,7 +51,7 @@ limits_config:
   ingestion_burst_size_mb: 32
   max_global_streams_per_user: 10000 # (default x 2)
   max_query_length: 0 # unlimited, default=721h
-  max_entries_limit_per_query: 25000
+  max_entries_limit_per_query: 50000
   max_query_series: 1000 # (default x 2)
   max_query_parallelism: 64 # (default x 2)
   max_concurrent_tail_requests: 50
@@ -75,3 +82,6 @@ frontend_worker:
 frontend:
   max_outstanding_per_tenant: 4096
   compress_responses: true
+
+analytics:
+  reporting_enabled: false
